@@ -1,64 +1,63 @@
-# health-boosting
+# 사용중인 모듈들 설명
 
-This template should help get you started developing with Vue 3 in Vite.
+1.
 
-## Recommended IDE Setup
+# 프로젝트 구조도 설명
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```
+Front-end/
+├── src/
+├── electron/
+├── mobile/
+│   ├── dist/ (vite 빌드 파일)
+│   ├── node_modules/ ($ npm install로 받은 모듈들)
+│   ├── release/ (electron-builder 빌드 파일)
+│   ├── src/renderer/
+│   │   ├── App.vue
+│   │   ├── index.html
+│   │   ├── main.js
+│   │   ├── style.css
+│   │   ├── api/
+│   │   ├── assets/
+│   │   │   ├── fonts/
+│   │   │   │   └── code128.ttf
+│   │   │   └── logo.png
+│   │   ├── components/
+│   │   │   ├── Canvas/
+│   │   │   │   ├── CoupangLabel.vue
+│   │   │   │   ├── LabelTemplate.vue
+│   │   │   │   └── ProdStdLabel.vue
+│   │   │   ├── common/
+│   │   │   │   ├──  (여기서부터 작업 시작)
+│   ├── .env
+│   ├── .eslintrc.cjs
+│   ├── .gitignore
+│   ├── .prettierrc
+│   ├── .project
+│   ├── cleanupOldLogs.cjs
+│   ├── electron-main.cjs
+│   ├── electron-newWindow.cjs
+│   ├── electron-print.cjs
+│   ├── generate-release-html.cjs
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── post-release.cjs
+│   ├── preload.cjs
+│   ├── release-note.html
+│   ├── release-notes.md
+│   ├── store.cjs
+│   ├── update.html
+└───└── vite.config.js
 ```
 
-### Compile and Hot-Reload for Development
+#
 
-```sh
-npm run dev
+# Health-Boosting Frontend
+
+## Capacitor 사용 예정
+
 ```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
-
-```sh
-# Install browsers for the first run
-npx playwright install
-
-# When testing on CI, must build the project first
-npm run build
-
-# Runs the end-to-end tests
-npm run test:e2e
-# Runs the tests only on Chromium
-npm run test:e2e -- --project=chromium
-# Runs the tests of a specific file
-npm run test:e2e -- tests/example.spec.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+@capacitor/core   	Capacitor 핵심 기능
+@capacitor/cli	    명령어 실행용 CLI
+@capacitor/android	안드로이드 플랫폼 지원
 ```

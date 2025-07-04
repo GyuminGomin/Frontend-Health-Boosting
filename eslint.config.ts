@@ -20,15 +20,25 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
-  
+
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
   skipFormatting,
+  // ✅ 커스텀 규칙을 명시적으로 추가
+  {
+    name: 'custom-rules',
+    rules: {
+      'no-console': 'warn',
+      // semi: ['error', 'always'],
+      eqeqeq: ['error', 'always'],
+      'no-unused-vars': 'error', // 혹시 누락돼 있다면 이 줄도
+    },
+  },
 )
