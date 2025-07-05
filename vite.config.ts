@@ -8,15 +8,19 @@ import renderer from 'vite-plugin-electron-renderer'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueDevTools(), electron({ entry: 'electron/main.ts' }), renderer()],
+  root: './src', // vue 기준 디렉토리 설정
+  base: './', // 루트 경로 설정
+  server: {
+    host: 'localhost',
+    port: 5173,
+  },
+  plugins: [vue(), vueDevTools(), electron({ entry: './electron/electron-main.js' }), renderer()],
   build: {
     outDir: 'dist/renderer',
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@common': fileURLToPath(new URL('./src/common', import.meta.url)),
-      '@login': fileURLToPath(new URL('./src/login', import.meta.url)),
     },
   },
 })

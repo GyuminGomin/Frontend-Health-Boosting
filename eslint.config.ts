@@ -39,6 +39,7 @@ export default defineConfigWithVueTs(
       // semi: ['error', 'always'],
       eqeqeq: ['error', 'always'],
       'no-unused-vars': 'error', // 혹시 누락돼 있다면 이 줄도
+      '@typescript-eslint/no-require-imports': 'off', // `require` 사용 허용
     },
   },
 )
