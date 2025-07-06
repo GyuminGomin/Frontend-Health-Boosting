@@ -14,7 +14,7 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
   },
-  plugins: [vue(), vueDevTools(), electron({ entry: './electron/electron-main.js' }), renderer()],
+  plugins: [vue(), vueDevTools(), electron({ entry: '../electron/electron-main.js' }), renderer()],
   build: {
     outDir: 'dist/renderer',
   },
