@@ -12,6 +12,9 @@
     }
   ],
   "compilerOptions": {
+    "composite": true,
+    "module": "commonjs",
+    "outDir": "dist",
     "baseUrl": ".", // 기본 경로를 루트로 설정
     "paths": {
       "@/*": ["src/*"] // `@`을 `src` 폴더로 매핑

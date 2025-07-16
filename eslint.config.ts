@@ -40,6 +40,7 @@ export default defineConfigWithVueTs(
       eqeqeq: ['error', 'always'],
       'no-unused-vars': 'error', // 혹시 누락돼 있다면 이 줄도
       '@typescript-eslint/no-require-imports': 'off', // `require` 사용 허용
+      '@typescript-eslint/no-explicit-any': ['warn'], // 강제는 아니고 경고만
     },
   },
 )

@@ -60,5 +60,45 @@
     "vitest": "^3.2.4",
     "vue-tsc": "^2.2.10",
     "vuetify": "^3.8.12"
+  },
+  "build": {
+    "appId": "com.healthboosting.app",
+    "productName": "Health Boosting",
+    "files": [
+      "dist-electron/**/*",
+      "dist/**/*",
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release-electron"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": true
+    }
   }
 }

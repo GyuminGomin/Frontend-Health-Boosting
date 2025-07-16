@@ -1,28 +1,58 @@
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow, app, ipcMain } from "electron";
 import { fileURLToPath } from "url";
 import path from "path";
+const __filename$1 = fileURLToPath(import.meta.url);
+const __dirname$1 = path.dirname(__filename$1);
+function oauth2Window(mainWindow2, oauthUrl) {
+  const authWindow = new BrowserWindow({
+    width: 500,
+    height: 600,
+    parent: mainWindow2,
+    modal: true,
+    show: true,
+    title: "OAUTH2 로그인",
+    webPreferences: {
+      preload: path.join(__dirname$1, "preload.js"),
+      nodeIntegration: false
+      // 보안을 위해 노드 통합 비활성화
+    }
+  });
+  authWindow.loadURL(oauthUrl);
+  authWindow.on("closed", () => {
+  });
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const __rendername = path.join(__dirname, "../dist/renderer");
+let mainWindow = null;
 const createWindow = () => {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     fullscreen: false,
     width: 1e3,
     height: 800,
     // icon: path.join(__dirname, 'src/common/assets/ico/nonghyup.ico'),
     title: "health boosting",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js")
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      // 보안을 위해 컨텍스트 격리 활성화
+      nodeIntegration: false
+      // 보안을 위해 노드 통합 비활성화
     }
   });
   if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
-    win.webContents.openDevTools();
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__rendername, "/index.html"));
+    mainWindow.loadFile(path.join(__rendername, "/index.html"));
   }
+  ipcMain.handle("oauth2:open", (e, oauth2Url) => {
+    oauth2Window(mainWindow, oauth2Url);
+  });
 };
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });

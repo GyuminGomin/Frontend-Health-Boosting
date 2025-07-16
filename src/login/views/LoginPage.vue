@@ -118,28 +118,17 @@ const logout = () => {
 
 const loginWithGoogle = () => {
   loginForm.loading_g = true
-  setTimeout(() => {
-    loginForm.loading_g = false
-    alert(`로그인 시도: ${loginForm.email}`)
-  }, 1000)
-  // window.location.href = 'https://your-backend.com/oauth2/authorize/google'
+  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/google')
 }
 
 const loginWithNaver = () => {
   loginForm.loading_n = true
-  setTimeout(() => {
-    loginForm.loading_n = false
-    alert(`로그인 시도: ${loginForm.email}`)
-  }, 1000)
-  // window.location.href = 'https://your-backend.com/oauth2/authorize/naver'
+  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/naver')
 }
 
 const loginWithKakao = () => {
   loginForm.loading_k = true
-  setTimeout(() => {
-    loginForm.loading_k = false
-    alert(`로그인 시도: ${loginForm.email}`)
-  }, 1000)
+  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/kakao')
 }
 </script>
 
