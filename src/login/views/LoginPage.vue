@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <div class="sky-wrapper"></div>
+    <SkyBackground />
     <v-card class="pa-6 pa-sm-4" max-width="420" elevation="8" rounded="x1">
       <v-card-title class="text-h5 font-weight-bold text-center mb-4 d-flex align-center gap-2">
         <img
@@ -40,7 +40,7 @@
         </v-form>
 
         <div class="d-flex justify-space-between mt-4 text-body-2">
-          <a href="#" @click.prevent="signup">회원가입</a>
+          <router-link to="/signup">회원가입</router-link>
           <a href="#" @click.prevent="logout">로그아웃</a>
         </div>
 
@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import SkyBackground from '@/common/components/background/SkyBackground.vue'
 import { reactive } from 'vue'
 
 const loginForm = reactive({
@@ -108,27 +109,30 @@ const login = () => {
     alert(`로그인 시도: ${loginForm.email}`)
   }, 1000)
 }
-const signup = () => {
-  alert('회원가입 페이지로 이동')
-}
 
 const logout = () => {
   alert('로그아웃 처리')
 }
 
-const loginWithGoogle = () => {
+const loginWithGoogle = async () => {
   loginForm.loading_g = true
-  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/google')
+  await window.electronAPI.invoke(
+    'oauth2:open',
+    'http://localhost:8282/oauth2/authorization/google',
+  )
+  loginForm.loading_g = false
 }
 
-const loginWithNaver = () => {
+const loginWithNaver = async () => {
   loginForm.loading_n = true
-  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/naver')
+  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/naver')
+  loginForm.loading_n = false
 }
 
-const loginWithKakao = () => {
+const loginWithKakao = async () => {
   loginForm.loading_k = true
-  window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/kakao')
+  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/kakao')
+  loginForm.loading_k = false
 }
 </script>
 
@@ -142,17 +146,5 @@ const loginWithKakao = () => {
     line-height: 1.6;
     color: #333;
   }
-}
-.sky-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  overflow: hidden;
-
-  background-image: url('@/common/assets/login/sky.svg');
-  background-size: cover;
 }
 </style>
