@@ -17,7 +17,7 @@
         <v-form @submit.prevent="login">
           <v-text-field
             v-model="loginForm.email"
-            label="이메일"
+            label="이메일 또는 아이디"
             type="email"
             prepend-inner-icon="mdi-email"
             dense
@@ -48,7 +48,7 @@
 
         <div class="text-center text-caption mb-2">SNS 계정으로 로그인</div>
 
-        <div class="d-flex flex-column gap-2">
+        <div class="d-flex flex-column mx-4" style="gap: 5px">
           <v-btn
             block
             color="red darken-1"
