@@ -44,45 +44,7 @@
           <a href="#" @click.prevent="logout">로그아웃</a>
         </div>
 
-        <v-divider class="my-6" />
-
-        <div class="text-center text-caption mb-2">SNS 계정으로 로그인</div>
-
-        <div class="d-flex flex-column mx-4" style="gap: 5px">
-          <v-btn
-            block
-            color="red darken-1"
-            class="text-white"
-            size="small"
-            :loading="loginForm.loading_g"
-            @click="loginWithGoogle"
-          >
-            <v-icon start size="small">mdi-google</v-icon>
-            Google 로그인
-          </v-btn>
-          <v-btn
-            block
-            color="#03c75a"
-            class="text-white"
-            size="small"
-            @click="loginWithNaver"
-            :loading="loginForm.loading_n"
-          >
-            <v-icon start size="small">mdi-leaf</v-icon>
-            Naver 로그인
-          </v-btn>
-          <v-btn
-            block
-            color="#FEE500"
-            class="text-black"
-            size="small"
-            @click="loginWithKakao"
-            :loading="loginForm.loading_k"
-          >
-            <v-icon start size="small">mdi-chat</v-icon>
-            Kakao 로그인
-          </v-btn>
-        </div>
+        <OAuth2LoginButton />
       </v-card-text>
     </v-card>
   </v-container>
@@ -90,6 +52,7 @@
 
 <script setup lang="ts">
 import SkyBackground from '@/common/components/background/SkyBackground.vue'
+import OAuth2LoginButton from '@/common/components/oAuth2/OAuth2LoginButton.vue'
 import { reactive } from 'vue'
 
 const loginForm = reactive({
@@ -112,27 +75,6 @@ const login = () => {
 
 const logout = () => {
   alert('로그아웃 처리')
-}
-
-const loginWithGoogle = async () => {
-  loginForm.loading_g = true
-  await window.electronAPI.invoke(
-    'oauth2:open',
-    'http://localhost:8282/oauth2/authorization/google',
-  )
-  loginForm.loading_g = false
-}
-
-const loginWithNaver = async () => {
-  loginForm.loading_n = true
-  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/naver')
-  loginForm.loading_n = false
-}
-
-const loginWithKakao = async () => {
-  loginForm.loading_k = true
-  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/kakao')
-  loginForm.loading_k = false
 }
 </script>
 

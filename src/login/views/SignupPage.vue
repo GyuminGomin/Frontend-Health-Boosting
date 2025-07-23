@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0" fluid>
+  <v-container class="fill-height d-flex align-center justify-center pa-0" fluid>
     <SkyBackground />
     <GoBack />
     <v-card class="mx-auto my-5 pa-4" max-width="500">
@@ -7,11 +7,11 @@
       <v-card-text>
         <v-form @submit.prevent="signup" ref="formRef">
           <!-- 프로필 이미지 + 이름 -->
-          <div class="d-flex align-center mb-4">
+          <div class="d-flex align-center mt-4">
             <!-- 클릭 가능한 이미지 미리보기 -->
             <v-avatar
               size="72"
-              class="me-4 cursor-pointer"
+              class="me-4 cursor-pointer mt-n7"
               @click="triggerImageUpload"
               @contextmenu.prevent="resetProfileImage"
             >
@@ -19,17 +19,9 @@
                 <v-img :src="imagePreview" alt="Profile Preview" cover />
               </template>
               <template v-else>
-                <v-icon size="36">mdi-account-circle</v-icon>
+                <v-icon size="72">mdi-account-circle</v-icon>
               </template>
             </v-avatar>
-
-            <!-- 이름 입력 -->
-            <v-text-field
-              v-model="form.name"
-              label="이름 또는 별명"
-              required
-              class="flex-grow-1"
-            ></v-text-field>
 
             <!-- 숨겨진 파일 input -->
             <input
@@ -39,16 +31,32 @@
               accept="image/*"
               @change="onImageSelected"
             />
+
+            <!-- 이름 입력 -->
+            <v-text-field
+              v-model="form.name"
+              label="이름 또는 별명"
+              :rules="nameRule"
+              required
+              class="flex-grow-1"
+              id="custom"
+            ></v-text-field>
           </div>
 
           <!-- 아이디 -->
-          <v-text-field v-model="form.userId" label="아이디" required></v-text-field>
+          <v-text-field
+            v-model="form.userId"
+            label="아이디"
+            :rules="userIdRule"
+            required
+          ></v-text-field>
 
           <!-- 이메일 + 인증 -->
           <v-text-field
             v-model="form.email"
             label="이메일"
             type="email"
+            :rules="emailRule"
             required
             append-inner-icon="mdi-email-check-outline"
             @click:append-inner="sendEmailVerification"
@@ -59,6 +67,7 @@
             v-model="form.password"
             label="비밀번호"
             type="password"
+            :rules="passwordRule"
             required
           ></v-text-field>
 
@@ -66,10 +75,16 @@
           <div class="d-flex flex-row gap-2">
             <v-select
               v-model="form.gender"
-              :items="['남성', '여성']"
+              :items="[
+                { text: '남성', value: 'M' },
+                { text: '여성', value: 'F' },
+              ]"
+              item-title="text"
+              item-value="value"
               label="성별"
               required
               class="flex-grow-1"
+              chips
             ></v-select>
             <v-text-field
               v-model="form.birthday"
@@ -85,9 +100,11 @@
             v-model="form.phoneNumber"
             label="휴대폰 번호"
             type="tel"
+            :rules="phoneNumberRule"
             required
             append-inner-icon="mdi-phone-check-outline"
             @click:append-inner="sendPhoneVerification"
+            @input="onPhoneNumberInput"
           ></v-text-field>
 
           <!-- 약관 동의 -->
@@ -98,57 +115,13 @@
           ></v-checkbox>
 
           <!-- 회원가입 버튼 -->
-          <v-btn
-            block
-            color="#1976D2"
-            class="mt-4 text-white signup-btn"
-            size="small"
-            type="submit"
-          >
+          <v-btn block color="#1976D2" class="text-white signup-btn" size="small" type="submit">
             회원가입
           </v-btn>
         </v-form>
       </v-card-text>
 
-      <v-divider class="my-2"></v-divider>
-
-      <div class="text-center text-caption mb-2">SNS 계정으로 로그인</div>
-
-      <div class="d-flex flex-column mx-4" style="gap: 5px">
-        <v-btn
-          block
-          color="red darken-1"
-          class="text-white"
-          size="small"
-          :loading="loginForm.loading_g"
-          @click="loginWithGoogle"
-        >
-          <v-icon start size="small">mdi-google</v-icon>
-          Google 로그인
-        </v-btn>
-        <v-btn
-          block
-          color="#03c75a"
-          class="text-white"
-          size="small"
-          @click="loginWithNaver"
-          :loading="loginForm.loading_n"
-        >
-          <v-icon start size="small">mdi-leaf</v-icon>
-          Naver 로그인
-        </v-btn>
-        <v-btn
-          block
-          color="#FEE500"
-          class="text-black"
-          size="small"
-          @click="loginWithKakao"
-          :loading="loginForm.loading_k"
-        >
-          <v-icon start size="small">mdi-chat</v-icon>
-          Kakao 로그인
-        </v-btn>
-      </div>
+      <OAuth2LoginButton />
     </v-card>
   </v-container>
 </template>
@@ -156,63 +129,46 @@
 <script setup lang="ts">
 import SkyBackground from '@/common/components/background/SkyBackground.vue'
 import GoBack from '@/common/components/GoBack.vue'
-import Swal from 'sweetalert2'
+import OAuth2LoginButton from '@/common/components/oAuth2/OAuth2LoginButton.vue'
+import { useImagePreview } from '@/common/composables/useImagePreview'
+import { useValidationRules } from '@/common/composables/useValidationRules'
 import { ref, reactive } from 'vue'
 
-// 기본 이미지 및 미리보기
-const imagePreview = ref<string>('')
-const fileInput = ref<HTMLInputElement | null>(null)
+const {
+  preview: imagePreview,
+  fileInput,
+  trigger: triggerImageUpload,
+  handleSelect: onImageSelected,
+  reset: resetProfileImage,
+} = useImagePreview()
 
-const triggerImageUpload = () => {
-  fileInput.value?.click()
-}
+const { nameRule, userIdRule, emailRule, passwordRule, phoneNumberRule } = useValidationRules()
 
-const resetProfileImage = () => {
-  if (imagePreview.value) {
-    Swal.fire({
-      title: '이미지 초기화',
-      text: '현재 프로필 이미지를 초기화하시겠습니까?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: '예',
-      cancelButtonText: '아니오',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        imagePreview.value = ''
-      }
-    })
-  }
-}
-
-const onImageSelected = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreview.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const loginForm = reactive({
-  loading_g: false,
-  loading_n: false,
-  loading_k: false,
-})
 const formRef = ref()
 const form = reactive({
   userId: '',
   email: '',
   password: '',
   name: '',
-  gender: '',
+  gender: 'M',
   phoneNumber: '',
   birthday: '',
   profileImage: null as File | null,
   termsAccepted: false,
 })
+
+const onPhoneNumberInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const value = input.value.replace(/\D/g, '') // 숫자만 남김
+
+  if (value.length <= 3) {
+    form.phoneNumber = value
+  } else if (value.length <= 7) {
+    form.phoneNumber = `${value.slice(0, 3)}-${value.slice(3)}`
+  } else {
+    form.phoneNumber = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`
+  }
+}
 
 // 회원가입 요청
 const signup = () => {
@@ -228,27 +184,6 @@ const sendPhoneVerification = () => {
 // 이메일 인증 요청
 const sendEmailVerification = () => {
   // 이메일 인증 요청
-}
-
-const loginWithGoogle = async () => {
-  loginForm.loading_g = true
-  await window.electronAPI.invoke(
-    'oauth2:open',
-    'http://localhost:8282/oauth2/authorization/google',
-  )
-  loginForm.loading_g = false
-}
-
-const loginWithNaver = async () => {
-  loginForm.loading_n = true
-  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/naver')
-  loginForm.loading_n = false
-}
-
-const loginWithKakao = async () => {
-  loginForm.loading_k = true
-  await window.electronAPI.invoke('oauth2:open', 'http://localhost:8282/oauth2/authorization/kakao')
-  loginForm.loading_k = false
 }
 </script>
 
