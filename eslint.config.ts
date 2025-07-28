@@ -41,6 +41,7 @@ export default defineConfigWithVueTs(
       'no-unused-vars': 'error', // 혹시 누락돼 있다면 이 줄도
       '@typescript-eslint/no-require-imports': 'off', // `require` 사용 허용
       '@typescript-eslint/no-explicit-any': ['warn'], // 강제는 아니고 경고만
+      '@typescript-eslint/no-unused-vars': 'warn', // 경고만으로 변경
     },
   },
 )

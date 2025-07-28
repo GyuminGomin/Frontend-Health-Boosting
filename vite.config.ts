@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
+import AutoImport from 'unplugin-auto-import/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,7 +15,20 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
   },
-  plugins: [vue(), vueDevTools(), electron({ entry: '../electron/electron-main.js' }), renderer()],
+  plugins: [
+    vue(),
+    vueDevTools(),
+    electron({ entry: '../electron/electron-main.js' }),
+    renderer(),
+    AutoImport({
+      imports: [
+        {
+          '@/common/stores/globalStore': ['useGlobalStore'], // 전역으로 등록
+        },
+      ],
+      dts: 'auto-imports.d.ts',
+    }),
+  ],
   build: {
     outDir: 'dist/renderer',
   },

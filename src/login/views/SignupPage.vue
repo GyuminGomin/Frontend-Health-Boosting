@@ -53,6 +53,7 @@
 
           <!-- 이메일 + 인증 -->
           <v-text-field
+            ref="emailRef"
             v-model="form.email"
             label="이메일"
             type="email"
@@ -60,6 +61,7 @@
             required
             append-inner-icon="mdi-email-check-outline"
             @click:append-inner="sendEmailVerification"
+            :disabled="controls.emailVerificationChk"
           ></v-text-field>
 
           <!-- 비밀번호 -->
@@ -124,6 +126,13 @@
       <OAuth2LoginButton />
     </v-card>
   </v-container>
+
+  <EmailVerificationDialog
+    v-model:visible="controls.emailVerificationDialog"
+    :email="form.email"
+    v-model:disabled="controls.emailVerificationChk"
+  />
+  />
 </template>
 
 <script setup lang="ts">
@@ -132,7 +141,12 @@ import GoBack from '@/common/components/GoBack.vue'
 import OAuth2LoginButton from '@/common/components/oAuth2/OAuth2LoginButton.vue'
 import { useImagePreview } from '@/common/composables/useImagePreview'
 import { useValidationRules } from '@/common/composables/useValidationRules'
-import { ref, reactive } from 'vue'
+import { ref, reactive, toRaw } from 'vue'
+import { useAxios } from '@/common/api/useAxios.ts'
+import EmailVerificationDialog from '@/common/components/EmailVerificationDialog.vue'
+import Swal from 'sweetalert2'
+
+const { post } = useAxios()
 
 const {
   preview: imagePreview,
@@ -145,6 +159,13 @@ const {
 const { nameRule, userIdRule, emailRule, passwordRule, phoneNumberRule } = useValidationRules()
 
 const formRef = ref()
+const emailRef = ref()
+
+const controls = reactive({
+  emailVerificationDialog: false,
+  emailVerificationChk: false,
+})
+
 const form = reactive({
   userId: '',
   email: '',
@@ -182,8 +203,24 @@ const sendPhoneVerification = () => {
 }
 
 // 이메일 인증 요청
-const sendEmailVerification = () => {
-  // 이메일 인증 요청
+const sendEmailVerification = async () => {
+  const isValid = await emailRef.value?.validate()
+  if (toRaw(isValid).length !== 0) {
+    return
+  }
+
+  try {
+    await post('/signup/send-verification', { email: form.email })
+
+    controls.emailVerificationDialog = true
+  } catch (error) {
+    console.error('이메일 전송 오류 : ', error)
+    Swal.fire({
+      title: '이메일 전송 실패',
+      text: '다시 시도해 주세요.',
+    })
+    return
+  }
 }
 </script>
 
