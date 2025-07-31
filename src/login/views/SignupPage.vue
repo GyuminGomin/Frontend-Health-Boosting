@@ -192,10 +192,14 @@ const onPhoneNumberInput = (event: Event) => {
 }
 
 // 회원가입 요청
-const signup = () => {
-  if (formRef.value?.validate()) {
-    // api
-  }
+const signup = async () => {
+  const isValid = await formRef.value?.validate()
+  if (!isValid) return
+
+  // const signUpData = new FormData()
+  // const
+
+  await post('/signup/regist', {})
 }
 // 휴대폰 인증 요청
 const sendPhoneVerification = () => {
