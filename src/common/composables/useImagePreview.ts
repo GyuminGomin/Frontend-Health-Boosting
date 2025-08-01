@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 export function useImagePreview() {
   const preview = ref('')
   const fileInput = ref<HTMLInputElement | null>(null)
+  const selectedFiles = ref<File[]>([]) // 여러 파일 저장
 
   const trigger = () => {
     if (fileInput.value) {
@@ -13,16 +14,30 @@ export function useImagePreview() {
     fileInput.value?.click()
   }
 
+  /**
+   * 한 개의 이미지만 올리는 곳에는 미리보기도 가능하게 설정할거고
+   * 여러 개 올리는 곳에는 그냥 파일 개수에 따라 여러개 S3로 올리게 설정
+   * @param event 클릭 이벤트
+   * @returns
+   */
   const handleSelect = (event: Event) => {
     const input = event.target as HTMLInputElement
-    const file = input.files?.[0]
-    if (file) {
+    const files = input.files
+
+    if (!files || files.length === 0) return
+
+    if (files.length === 1) {
+      const file = files[0]
       const reader = new FileReader()
       reader.onload = (e) => {
         preview.value = e.target?.result as string
       }
       reader.readAsDataURL(file)
     }
+
+    Array.from(files).forEach((file) => {
+      selectedFiles.value.push(file)
+    })
   }
 
   const reset = async () => {

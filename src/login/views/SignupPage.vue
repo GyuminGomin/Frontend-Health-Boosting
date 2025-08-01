@@ -199,7 +199,7 @@ const signup = async () => {
   // const signUpData = new FormData()
   // const
 
-  await post('/signup/regist', {})
+  await post('/signup/regist', { form })
 }
 // 휴대폰 인증 요청
 const sendPhoneVerification = () => {
