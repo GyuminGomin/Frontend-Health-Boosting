@@ -1,8 +1,11 @@
 import { ref } from 'vue'
 import Swal from 'sweetalert2'
 
-export function useImagePreview() {
-  const preview = ref('')
+type Mode = 'single' | 'multi'
+
+export function useImagePreview(mode: Mode = 'single') {
+  const preview = ref('') // single 미리보기
+  const previews = ref<string[]>([]) // multi 미리보기
   const fileInput = ref<HTMLInputElement | null>(null)
   const selectedFiles = ref<File[]>([]) // 여러 파일 저장
 
@@ -23,25 +26,37 @@ export function useImagePreview() {
   const handleSelect = (event: Event) => {
     const input = event.target as HTMLInputElement
     const files = input.files
+    // 만약 다중 미리보기 files = ref<string[]>([])
 
     if (!files || files.length === 0) return
 
-    if (files.length === 1) {
-      const file = files[0]
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        preview.value = e.target?.result as string
-      }
-      reader.readAsDataURL(file)
+    // 초기화
+    selectedFiles.value = []
+    if (mode === 'single') {
+      preview.value = ''
+    } else {
+      previews.value = []
     }
 
-    Array.from(files).forEach((file) => {
+    Array.from(files).forEach((file, index) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        if (mode === 'single' && index === 0) {
+          preview.value = result
+        } else if (mode === 'multi') {
+          previews.value.push(result)
+        }
+      }
+      reader.readAsDataURL(file)
       selectedFiles.value.push(file)
     })
   }
 
   const reset = async () => {
-    if (!preview.value) return
+    const hasData = mode === 'single' ? preview.value : previews.value.length > 0
+    if (!hasData) return
+
     const result = await Swal.fire({
       title: '이미지 초기화',
       text: '현재 프로필 이미지를 초기화하시겠습니까?',
@@ -51,12 +66,23 @@ export function useImagePreview() {
       cancelButtonText: '아니오',
     })
     if (result.isConfirmed) {
-      preview.value = ''
+      selectedFiles.value = []
+      if (mode === 'single') {
+        preview.value = ''
+      } else {
+        previews.value = []
+      }
+      if (fileInput.value) {
+        fileInput.value.value = ''
+      }
     }
   }
 
   return {
-    preview,
+    mode,
+    preview, // 단일
+    previews, // 다중
+    selectedFiles,
     fileInput,
     trigger,
     handleSelect,

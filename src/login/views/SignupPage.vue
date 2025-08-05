@@ -29,7 +29,7 @@
               ref="fileInput"
               style="display: none"
               accept="image/*"
-              @change="onImageSelected"
+              @change="handleSelect"
             />
 
             <!-- 이름 입력 -->
@@ -146,13 +146,14 @@ import { useAxios } from '@/common/api/useAxios.ts'
 import EmailVerificationDialog from '@/common/components/EmailVerificationDialog.vue'
 import Swal from 'sweetalert2'
 
-const { post } = useAxios()
+const { post, postMultipart } = useAxios()
 
 const {
   preview: imagePreview,
   fileInput,
+  selectedFiles,
   trigger: triggerImageUpload,
-  handleSelect: onImageSelected,
+  handleSelect,
   reset: resetProfileImage,
 } = useImagePreview()
 
@@ -174,7 +175,6 @@ const form = reactive({
   gender: 'M',
   phoneNumber: '',
   birthday: '',
-  profileImage: null as File | null,
   termsAccepted: false,
 })
 
@@ -193,13 +193,20 @@ const onPhoneNumberInput = (event: Event) => {
 
 // 회원가입 요청
 const signup = async () => {
-  const isValid = await formRef.value?.validate()
-  if (!isValid) return
+  // const isValid = await formRef.value?.validate()
+  // if (!isValid.value) return
 
-  // const signUpData = new FormData()
-  // const
+  if (!controls.emailVerificationChk) {
+    Swal.fire({
+      title: '이메일 인증 필요',
+      text: '이메일 인증은 필수입니다.',
+      icon: 'warning',
+    })
 
-  await post('/signup/regist', { form })
+    return
+  }
+
+  await postMultipart('/signup/regist', { form }, { profileImage: selectedFiles.value[0] || null })
 }
 // 휴대폰 인증 요청
 const sendPhoneVerification = () => {
