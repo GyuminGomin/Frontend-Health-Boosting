@@ -1,3 +1,7 @@
 ::v-deep(.v-label) {
   color: #959595 !important;
 }
+
+.swal2-container {
+  z-index: 3000 !important;
+}

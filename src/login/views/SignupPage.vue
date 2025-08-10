@@ -132,7 +132,6 @@
     :email="form.email"
     v-model:disabled="controls.emailVerificationChk"
   />
-  />
 </template>
 
 <script setup lang="ts">
@@ -220,18 +219,9 @@ const sendEmailVerification = async () => {
     return
   }
 
-  try {
-    await post('/signup/send-verification', { email: form.email })
+  await post('/signup/send-verification', { email: form.email })
 
-    controls.emailVerificationDialog = true
-  } catch (error) {
-    console.error('이메일 전송 오류 : ', error)
-    Swal.fire({
-      title: '이메일 전송 실패',
-      text: '다시 시도해 주세요.',
-    })
-    return
-  }
+  controls.emailVerificationDialog = true
 }
 </script>
 

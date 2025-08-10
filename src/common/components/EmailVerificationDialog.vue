@@ -78,27 +78,18 @@ const stopTimer = () => {
 
 // 인증 확인
 const confirm = async () => {
-  try {
-    await post<boolean>('/signup/verify-code', {
-      email: props.email,
-      code: code.value,
-    })
+  await post<boolean>('/signup/verify-code', {
+    email: props.email,
+    code: code.value,
+  }).finally(() => {
+    stopTimer()
+    emit('update:visible', false)
+  })
+  emit('update:disabled', true)
 
-    stopTimer()
-    emit('update:disabled', true)
-    emit('update:visible', false)
-    Swal.fire({
-      title: '인증 성공',
-    })
-  } catch (e) {
-    Swal.fire({
-      title: '인증 실패',
-      text: '올바르지 않은 인증 코드를 입력하였습니다.',
-    })
-    stopTimer()
-    emit('update:visible', false)
-    console.error(e)
-  }
+  Swal.fire({
+    title: '인증 성공',
+  })
 }
 
 // 인증 취소
