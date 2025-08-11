@@ -1,6 +1,7 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
     <SkyBackground />
+
     <v-card class="pa-6 pa-sm-4" max-width="420" elevation="8" rounded="x1">
       <v-card-title class="text-h5 font-weight-bold text-center mb-4 d-flex align-center gap-2">
         <img
@@ -12,7 +13,7 @@
         />
         Health Boost 로그인
       </v-card-title>
-
+      <router-link to="/user-info">테스트</router-link>
       <v-card-text>
         <v-form @submit.prevent="login">
           <v-text-field
